@@ -1,23 +1,22 @@
+from dotenv import load_dotenv
 import PySimpleGUI as sg
 import pandas as pd
+import webbrowser
 import requests
 import json
 import os
-from dotenv import load_dotenv
 
 load_dotenv()
 api_key = os.getenv("DPLA_API_KEY")
 
 # GUI
-data_frame_layout = [[sg.Text('What would you like to search?'), sg.InputText(key='_TERM_')]]
-output_frame_layout = [[sg.Button('Search')]]
+search_layout = [[sg.Text('What would you like to search?'), sg.InputText(key='_TERM_')],
+                 [sg.Button('Search')]]
 
-layout = [[sg.Frame('Input', data_frame_layout)],
-          [sg.Frame('Output', output_frame_layout)]]
-enter_data_window = sg.Window('DPLA Search', layout)
+main_layout = [[sg.Frame('Input', search_layout)]]
+enter_data_window = sg.Window('DPLA Search', main_layout)
 
 
-# Functions
 def get_data_based_on_search_term(term):
     # request the data
     search_url = f'https://api.dp.la/v2/items?q={term}&api_key={api_key}'
@@ -38,6 +37,7 @@ def extract_relevant_data(total_data_list):
         extracted_data_list = []
         for result in total_data_list:
             # add extracted data to a new dict
+            # TODO account for missing keys
             extracted_data_dict = {}
             extracted_data_dict["_ID_"] = result["id"]
             extracted_data_dict["_INGEST_DATE_"] = result["ingestDate"]
@@ -49,20 +49,35 @@ def extract_relevant_data(total_data_list):
         print("No results found.")
 
 
-def create_dataframe_and_convert_to_html_table(data_dict):
+def create_dataframe_and_convert_to_html_table(data_dict, term):
     df = pd.DataFrame(data_dict)
-    df.to_html('search_results.html')
-    return df
+
+    # TODO continue styling
+    # table style
+    html = {
+        df.style
+        .set_caption(f"Search results for: {term}")
+        .render()
+    }
+    html_list = list(html)
+    print(html)
+    # write to file
+    with open("search_results.html", "w") as f:
+        f.write(html_list[0])
 
 
-# Main Loop
+# main Loop
 program_running = True
 if program_running:
     event, values = enter_data_window.Read()
     if event == 'Search':
+        search_term = values["_TERM_"]
         data = get_data_based_on_search_term(values["_TERM_"])
         if data:
             relevant_data = extract_relevant_data(data)
-            dataframe = create_dataframe_and_convert_to_html_table(relevant_data)
+            create_dataframe_and_convert_to_html_table(relevant_data, search_term)
+
+            file_location = "/Users/patrick/Git/DPLA_search/search_results.html"
+            webbrowser.open(f"file://{file_location}", new=2)
         else:
             print("Try another search term.")
