@@ -2,3 +2,4 @@ PySimpleGUI
 pandas
 requests
 python-dotenv
+jinja2

@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 import PySimpleGUI as sg
+from pathlib import Path
 import pandas as pd
 import webbrowser
 import requests
@@ -87,7 +88,6 @@ if program_running:
             relevant_data = extract_relevant_data(data)
             create_dataframe_and_convert_to_html_table(relevant_data, search_term)
 
-            file_location = "/Users/patrick/Git/DPLA_search/search_results.html"
-            webbrowser.open(f"file://{file_location}", new=2)
+            webbrowser.open(f"file://{os.path.realpath('search_results.html')}", new=2)
         else:
             print("Try another search term.")
