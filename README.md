@@ -3,6 +3,7 @@ DPLA_search is designed to take a search term from user input, use the term to s
 
 # How to Run
 1. Clone this repository
+2. Copy private `.env` file to root of directory.
 2. Navigate to the folder in Terminal using `cd /Users/your_name/DPLA_search`
 3. Install requirements using `pip3 install -r requirements.txt`
 4. Run the `dpla_search.py` script using `python3 dpla_search.py`
